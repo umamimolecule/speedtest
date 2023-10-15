@@ -1,14 +1,14 @@
 export type SpeedTestResult = {
   contentLength: number;
   duration: number;
-  megabytesPerSecond: number;
+  megabitsPerSecond: number;
 };
 
 export type SpeedTestProgressResult = {
   downloadedBytes: number;
   contentLength: number;
   duration: number;
-  megabytesPerSecond: number;
+  megabitsPerSecond: number;
 };
 
 async function downloadFileInChunks(
@@ -34,14 +34,19 @@ async function downloadFileInChunks(
   while (true) {
     const { done, value } = await reader.read();
 
+    console.log(Date.now());
+
+    // TODO: Add debouncing to progress update calls
+
     if (value) {
       downloadedBytes += value.length;
 
       const duration = (Date.now() - startTime) / 1000;
-      const megabytesPerSecond = downloadedBytes / (1024 * 1024) / duration;
+      const megabitsPerSecond =
+        (downloadedBytes * 8) / (1024 * 1024) / duration;
       onProgress({
         contentLength,
-        megabytesPerSecond,
+        megabitsPerSecond: megabitsPerSecond,
         downloadedBytes,
         duration
       });
@@ -57,8 +62,8 @@ async function downloadFileInChunks(
   return {
     contentLength,
     duration: endTime - startTime,
-    megabytesPerSecond:
-      contentLength / (1024 * 1024) / ((endTime - startTime) / 1000)
+    megabitsPerSecond:
+      (contentLength * 8) / (1024 * 1024) / ((endTime - startTime) / 1000)
   };
 }
 

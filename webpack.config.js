@@ -24,8 +24,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/client/index.html',
       favicon: './src/client/favicon.ico',
-      title: "Hazik's Web App",
-      description: "Web application for Hazik's web app"
+      title: 'Network speed test'
     }),
     new CopyPlugin({
       patterns: [
@@ -37,7 +36,8 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'build'),
     filename: 'bundle.[hash].js',
-    publicPath: '/'
+    publicPath: '/',
+    clean: true
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
