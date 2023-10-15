@@ -9,7 +9,7 @@ const app: Application = express();
 
 app.get('/stream', (req, res) => {
   // Create a Readable Stream (in this case, reading from a file)
-  const contentLength = 1024 * 1024 * 1024;
+  const contentLength = 2 * 1024 * 1024 * 1024;
   const stream = randomBytesReadableStream({ size: contentLength });
 
   // Set response headers

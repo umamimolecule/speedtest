@@ -30,6 +30,7 @@ export function App() {
       setResult(result);
     } finally {
       setRunningTest(false);
+      setProgressResult(null);
     }
   };
 
@@ -46,10 +47,36 @@ export function App() {
     );
   };
 
+  const renderProgressBar = () => {
+    if (!runningTest || !progressResult) {
+      return (
+        <div
+          className="-mt-8"
+          style={{ height: '4px', background: 'transparent' }}
+        >
+          {' '}
+        </div>
+      );
+    }
+
+    const percent = Math.round(
+      (100 * progressResult.downloadedBytes) / progressResult.contentLength
+    );
+
+    return (
+      <div
+        className="bg-blue-500 self-start -mt-8"
+        style={{ width: `${percent}%`, height: '4px' }}
+      >
+        {' '}
+      </div>
+    );
+  };
+
   return (
     <div className="app">
       <div className="flex flex-col gap-10 items-center justify-center border-solid border-2 rounded-3xl border-neutral-500 p-8 min-w-[400px] bg-neutral-900">
-        <div className="text-3xl text-neutral-300 mb-4 font-thin">
+        <div className="text-3xl text-neutral-100 mb-4 font-thin">
           Network speed test
         </div>
         {runningTest ? (
@@ -57,6 +84,7 @@ export function App() {
         ) : (
           <div>{formatRate(result?.megabytesPerSecond)}</div>
         )}
+        {renderProgressBar()}
         <button
           className={cn([
             'bg-blue-500 hover:bg-blue-700 disabled:bg-neutral-600 text-white disabled:text-neutral-400 py-2 px-4 rounded'

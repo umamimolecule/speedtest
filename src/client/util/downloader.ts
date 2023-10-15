@@ -13,7 +13,7 @@ export type SpeedTestProgressResult = {
 
 async function downloadFileInChunks(
   url: string,
-  onProgress: (result: SpeedTestResult) => void
+  onProgress: (result: SpeedTestProgressResult) => void
 ): Promise<SpeedTestResult> {
   const response = await fetch(url);
   if (!response.ok) {
@@ -42,6 +42,7 @@ async function downloadFileInChunks(
       onProgress({
         contentLength,
         megabytesPerSecond,
+        downloadedBytes,
         duration
       });
     }
