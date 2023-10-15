@@ -11,6 +11,8 @@ export type SpeedTestProgressResult = {
   megabitsPerSecond: number;
 };
 
+const PROGRESS_UPDATE_MS = 200;
+
 async function downloadFileInChunks(
   url: string,
   onProgress: (result: SpeedTestProgressResult) => void
@@ -31,38 +33,50 @@ async function downloadFileInChunks(
   let downloadedBytes = 0;
   const reader = response.body.getReader();
 
-  while (true) {
-    const { done, value } = await reader.read();
+  let canUpdate = false;
+  const id = setInterval(() => {
+    canUpdate = true;
+  }, PROGRESS_UPDATE_MS);
 
-    // TODO: Add debouncing to progress update calls
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
 
-    if (value) {
-      downloadedBytes += value.length;
+      if (value) {
+        downloadedBytes += value.length;
 
-      const duration = (Date.now() - startTime) / 1000;
-      const megabitsPerSecond =
-        (downloadedBytes * 8) / (1024 * 1024) / duration;
-      onProgress({
-        contentLength,
-        megabitsPerSecond: megabitsPerSecond,
-        downloadedBytes,
-        duration
-      });
+        const duration = (Date.now() - startTime) / 1000;
+        const megabitsPerSecond =
+          (downloadedBytes * 8) / (1024 * 1024) / duration;
+
+        if (canUpdate) {
+          onProgress({
+            contentLength,
+            megabitsPerSecond,
+            downloadedBytes,
+            duration
+          });
+
+          canUpdate = false;
+        }
+      }
+
+      if (done) {
+        break;
+      }
     }
 
-    if (done) {
-      break;
-    }
+    const endTime = Date.now();
+
+    return {
+      contentLength,
+      duration: endTime - startTime,
+      megabitsPerSecond:
+        (contentLength * 8) / (1024 * 1024) / ((endTime - startTime) / 1000)
+    };
+  } finally {
+    clearInterval(id);
   }
-
-  const endTime = Date.now();
-
-  return {
-    contentLength,
-    duration: endTime - startTime,
-    megabitsPerSecond:
-      (contentLength * 8) / (1024 * 1024) / ((endTime - startTime) / 1000)
-  };
 }
 
 export { downloadFileInChunks };

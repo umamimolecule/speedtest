@@ -24,7 +24,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/client/index.html',
       favicon: './src/client/favicon.ico',
-      title: 'Network speed test'
+      title: 'LAN speed test'
     }),
     new CopyPlugin({
       patterns: [
