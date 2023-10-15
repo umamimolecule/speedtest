@@ -34,8 +34,6 @@ async function downloadFileInChunks(
   while (true) {
     const { done, value } = await reader.read();
 
-    console.log(Date.now());
-
     // TODO: Add debouncing to progress update calls
 
     if (value) {
