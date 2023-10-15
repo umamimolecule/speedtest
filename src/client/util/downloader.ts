@@ -13,7 +13,6 @@ export type SpeedTestProgressResult = {
 
 async function downloadFileInChunks(
   url: string,
-  chunkSize: number,
   onProgress: (result: SpeedTestResult) => void
 ): Promise<SpeedTestResult> {
   const response = await fetch(url);
@@ -29,30 +28,27 @@ async function downloadFileInChunks(
     10
   );
 
-  console.log({ contentLength, chunkSize });
-  const totalChunks = Math.ceil(contentLength / chunkSize);
   let downloadedBytes = 0;
-
   const reader = response.body.getReader();
 
-  let done = false;
-  while (!done) {
+  while (true) {
     const { done, value } = await reader.read();
 
-    if (done) {
-      console.log('done');
-      break;
+    if (value) {
+      downloadedBytes += value.length;
+
+      const duration = (Date.now() - startTime) / 1000;
+      const megabytesPerSecond = downloadedBytes / (1024 * 1024) / duration;
+      onProgress({
+        contentLength,
+        megabytesPerSecond,
+        duration
+      });
     }
 
-    downloadedBytes += value.length;
-
-    const duration = (Date.now() - startTime) / 1000;
-    const megabytesPerSecond = downloadedBytes / (1024 * 1024) / duration;
-    onProgress({
-      contentLength,
-      megabytesPerSecond,
-      duration
-    });
+    if (done) {
+      break;
+    }
   }
 
   const endTime = Date.now();

@@ -1,6 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #101010;
+  color: white;
+  margin: 16px;
+}
+
 .app {
-  font-size: xx-large;
-  a {
-    font-size: xx-small;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.test-results {
+  flex: 1 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  justify-content: center;
 }
