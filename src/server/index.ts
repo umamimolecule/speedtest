@@ -29,6 +29,11 @@ app.get('/stream', (req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/version', (req, res) => {
+  var pjson = require('../../package.json');
+  res.send({ version: pjson.version });
+});
+
 app.use(
   PUBLIC_URL,
   express.static(path.resolve(__dirname, '../../build'), { maxAge: Infinity })
