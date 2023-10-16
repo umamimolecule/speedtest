@@ -1,6 +1,6 @@
 #! /bin/sh
 OSTYPE="$(uname -s)"
-installLocation="/homr"
+installLocation="/home"
 cd $installLocation
 echo "Opening Install Location : \"$installLocation\""
 if [ ! -d "LANSpeedTest" ]; then
