@@ -44,6 +44,7 @@ sudo npm install typescript -g
 # TODO: Build project
 echo "Building project"
 sudo npm i
+sudo npm run build
 sudo tsc
 
 echo "Installing PM2"
