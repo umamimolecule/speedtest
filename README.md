@@ -1,6 +1,14 @@
 # LANSpeedTest
 
-## Installation (Ubuntu)
+## Notes for Proxmox
+
+Choose the following settings:
+
+- 2GB disk size
+- 1 core
+- 512MB RAM
+
+## Installation (Only Ubuntu supported at the moment)
 
 Install curl if needed
 
