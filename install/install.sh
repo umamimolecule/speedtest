@@ -10,6 +10,9 @@ if [ ! -d "LANSpeedTest" ]; then
         if [ -x "$(command -v apt)" ]; then
             sudo apt update
             sudo apt install git -y
+        else
+            echo "OS not supported - exiting"
+            exit 1
         fi
     fi
     # Check if wget is needed
@@ -17,6 +20,9 @@ if [ ! -d "LANSpeedTest" ]; then
         # Check if Ubuntu
         if [ -x "$(command -v apt)" ]; then
             sudo apt install wget -y
+        else
+            echo "OS not supported - exiting"
+            exit 1
         fi
     fi
 
