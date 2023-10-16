@@ -37,7 +37,13 @@ sh $DIR/nodejs-ubuntu.sh
 if ! [ -x "$(command -v npm)" ]; then
     sudo apt install npm -y
 fi
-sudo apt install make zip -y
+
+echo "Installing TypeScript"
+sudo npm install typescript -g
+
+# TODO: Build project
+echo "Building project"
+sudo tsc
 
 echo "Installing PM2"
 sudo npm install pm2@latest -g
@@ -47,7 +53,7 @@ sudo chmod -R 755 .
 touch install/installed.txt
 
 echo "Starting LANSpeedTest and setting to start on boot"
-sudo pm2 start dist/index.js
+sudo pm2 start server/index.ts
 sudo pm2 startup
 sudo pm2 save
 sudo pm2 list
