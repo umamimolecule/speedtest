@@ -12,12 +12,11 @@ if [ ! -d "LANSpeedTest" ]; then
             sudo apt install git -y
         fi
     fi
-        # Check if wget is needed
-        if [ ! -x "$(command -v wget)" ]; then
-            # Check if Ubuntu
-            if [ -x "$(command -v apt)" ]; then
-                sudo apt install wget -y
-            fi
+    # Check if wget is needed
+    if [ ! -x "$(command -v wget)" ]; then
+        # Check if Ubuntu
+        if [ -x "$(command -v apt)" ]; then
+            sudo apt install wget -y
         fi
     fi
 
