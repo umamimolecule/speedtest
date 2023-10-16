@@ -55,7 +55,7 @@ sudo chmod -R 755 .
 touch install/installed.txt
 
 echo "Starting LANSpeedTest and setting to start on boot"
-sudo pm2 start server/index.ts
+sudo pm2 start build/server/index.js
 sudo pm2 startup
 sudo pm2 save
 sudo pm2 list
