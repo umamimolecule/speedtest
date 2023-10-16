@@ -48,7 +48,7 @@
   },
   "scripts": {
     "build": "webpack --mode production",
-    "start": "npm run build && nodemon",
+    "start": "npm run build && nodemon lanspeedtest.js",
     "start2": "concurrently \"npm run start:server\" \"npm run start:webapp\"",
     "start:webapp": "webpack serve --mode development",
     "start:server": "nodemon",

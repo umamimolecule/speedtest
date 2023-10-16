@@ -1,6 +1,5 @@
 import express, { Application } from 'express';
 import path from 'path';
-import randomBytesReadableStream from './randomStream';
 import endlessRandomBytesReadableStream from './endlessRandomStream';
 
 const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
