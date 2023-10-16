@@ -25,6 +25,16 @@ if [ ! -d "LANSpeedTest" ]; then
             exit 1
         fi
     fi
+    # Check if nettools is needed
+    if [ ! -x "$(command -v ifconfig)" ]; then
+        # Check if Ubuntu
+        if [ -x "$(command -v apt)" ]; then
+            sudo apt install net-tools -y
+        else
+            echo "OS not supported - exiting"
+            exit 1
+        fi
+    fi
 
     productName="LANSpeedTest"
     echo "Getting the Main Branch"
