@@ -61,4 +61,4 @@ sudo pm2 save
 sudo pm2 list
 
 echo "Install Completed"
-echo "Open http://$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'):8080 in your web browser."
+echo "Open http://$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'):3000 in your web browser."
