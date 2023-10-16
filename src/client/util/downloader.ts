@@ -1,20 +1,21 @@
 export type SpeedTestResult = {
-  contentLength: number;
+  downloadedBytes: number;
   duration: number;
   megabitsPerSecond: number;
 };
 
 export type SpeedTestProgressResult = {
   downloadedBytes: number;
-  contentLength: number;
   duration: number;
   megabitsPerSecond: number;
+  percentDone: number;
 };
 
 const PROGRESS_UPDATE_MS = 200;
 
 async function downloadFileInChunks(
   url: string,
+  totalDuration: number,
   onProgress: (result: SpeedTestProgressResult) => void
 ): Promise<SpeedTestResult> {
   const response = await fetch(url);
@@ -38,23 +39,29 @@ async function downloadFileInChunks(
     canUpdate = true;
   }, PROGRESS_UPDATE_MS);
 
+  let megabitsPerSecond = 0;
   try {
     while (true) {
+      const percentDone = (100 * (Date.now() - startTime)) / totalDuration;
+      if (percentDone >= 100) {
+        reader.cancel();
+        break;
+      }
+
       const { done, value } = await reader.read();
 
       if (value) {
         downloadedBytes += value.length;
 
         const duration = (Date.now() - startTime) / 1000;
-        const megabitsPerSecond =
-          (downloadedBytes * 8) / (1024 * 1024) / duration;
+        megabitsPerSecond = (downloadedBytes * 8) / (1024 * 1024) / duration;
 
         if (canUpdate) {
           onProgress({
-            contentLength,
             megabitsPerSecond,
             downloadedBytes,
-            duration
+            duration,
+            percentDone
           });
 
           canUpdate = false;
@@ -69,10 +76,9 @@ async function downloadFileInChunks(
     const endTime = Date.now();
 
     return {
-      contentLength,
+      downloadedBytes,
       duration: endTime - startTime,
-      megabitsPerSecond:
-        (contentLength * 8) / (1024 * 1024) / ((endTime - startTime) / 1000)
+      megabitsPerSecond
     };
   } finally {
     clearInterval(id);

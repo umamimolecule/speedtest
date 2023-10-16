@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import path from 'path';
 import randomBytesReadableStream from './randomStream';
+import endlessRandomBytesReadableStream from './endlessRandomStream';
 
 const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
 const PORT: string = process.env.PORT || '3000';
@@ -8,13 +9,11 @@ const PORT: string = process.env.PORT || '3000';
 const app: Application = express();
 
 app.get('/stream', (req, res) => {
-  // Create a Readable Stream (in this case, reading from a file)
-  const contentLength = 5 * 1024 * 1024 * 1024;
-  const stream = randomBytesReadableStream({ size: contentLength });
+  const stream = endlessRandomBytesReadableStream();
 
   // Set response headers
   res.setHeader('Content-Type', 'application/octet-stream');
-  res.setHeader('Content-Length', contentLength.toString());
+  // res.setHeader('Content-Length', '999999999999');
 
   // Pipe the Readable Stream to the Response
   stream.pipe(res);

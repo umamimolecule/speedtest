@@ -7,6 +7,8 @@ import {
   downloadFileInChunks
 } from './util/downloader';
 
+const TEST_DURATION = 10000;
+
 export function App() {
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
@@ -34,9 +36,10 @@ export function App() {
   const startDownload = async () => {
     setRunningTest(true);
     try {
-      const now = Date.now();
+      const start = Date.now();
       const result = await downloadFileInChunks(
-        `/stream?ts=${now}`,
+        `/stream?ts=${start}`,
+        TEST_DURATION,
         onProgress
       );
       setResult(result);
@@ -78,9 +81,7 @@ export function App() {
       );
     }
 
-    const percent = Math.round(
-      (100 * progressResult.downloadedBytes) / progressResult.contentLength
-    );
+    const percent = Math.round(progressResult.percentDone);
 
     return (
       <div
