@@ -71,7 +71,6 @@ async function downloadFileInChunks(
               return sum + curr;
             }, 0) / samples.length;
 
-          console.log(samples.length);
           onProgress({
             megabitsPerSecond,
             percentDone
