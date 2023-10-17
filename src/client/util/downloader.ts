@@ -5,13 +5,15 @@ export type SpeedTestResult = {
 };
 
 export type SpeedTestProgressResult = {
-  downloadedBytes: number;
-  duration: number;
   megabitsPerSecond: number;
   percentDone: number;
 };
 
 const PROGRESS_UPDATE_MS = 200;
+
+function calculateMBps(byteCount: number, durationMs: number): number {
+  return (byteCount * 8) / (1024 * 1024) / (durationMs / 1000);
+}
 
 async function downloadFileInChunks(
   url: string,
@@ -26,18 +28,20 @@ async function downloadFileInChunks(
   }
 
   const startTime = Date.now();
-  const contentLength = Number.parseInt(
-    response.headers.get('content-length'),
-    10
-  );
 
-  let downloadedBytes = 0;
+  let totalDownloadedBytes = 0;
+  let downloadedBytesSinceLastUpdate = 0;
+  let lastUpdateTime = Date.now();
+
   const reader = response.body.getReader();
 
   let canUpdate = false;
   const id = setInterval(() => {
     canUpdate = true;
   }, PROGRESS_UPDATE_MS);
+
+  const sampleCount = 20;
+  let samples: number[] = [];
 
   let megabitsPerSecond = 0;
   try {
@@ -51,19 +55,30 @@ async function downloadFileInChunks(
       const { done, value } = await reader.read();
 
       if (value) {
-        downloadedBytes += value.length;
-
-        const duration = (Date.now() - startTime) / 1000;
-        megabitsPerSecond = (downloadedBytes * 8) / (1024 * 1024) / duration;
+        totalDownloadedBytes += value.length;
+        downloadedBytesSinceLastUpdate += value.length;
 
         if (canUpdate) {
+          const sample = calculateMBps(
+            downloadedBytesSinceLastUpdate,
+            Date.now() - lastUpdateTime
+          );
+
+          samples = [sample, ...samples.slice(0, sampleCount - 1)];
+
+          megabitsPerSecond =
+            samples.reduce((sum, curr) => {
+              return sum + curr;
+            }, 0) / samples.length;
+
+          console.log(samples.length);
           onProgress({
             megabitsPerSecond,
-            downloadedBytes,
-            duration,
             percentDone
           });
 
+          lastUpdateTime = Date.now();
+          downloadedBytesSinceLastUpdate = 0;
           canUpdate = false;
         }
       }
@@ -76,7 +91,7 @@ async function downloadFileInChunks(
     const endTime = Date.now();
 
     return {
-      downloadedBytes,
+      downloadedBytes: totalDownloadedBytes,
       duration: endTime - startTime,
       megabitsPerSecond
     };
