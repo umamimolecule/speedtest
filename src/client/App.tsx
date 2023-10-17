@@ -7,7 +7,7 @@ import {
   downloadFileInChunks
 } from './util/downloader';
 
-const TEST_DURATION = 10000;
+const TEST_DURATION = 20000;
 
 export function App() {
   const [startTime, setStartTime] = useState(0);
