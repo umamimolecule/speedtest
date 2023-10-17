@@ -64,17 +64,24 @@ async function downloadFileInChunks(
             Date.now() - lastUpdateTime
           );
 
-          samples = [sample, ...samples.slice(0, sampleCount - 1)];
+          if (
+            sample !== Number.POSITIVE_INFINITY &&
+            sample !== Number.NEGATIVE_INFINITY
+          ) {
+            samples = [sample, ...samples.slice(0, sampleCount - 1)];
+          }
 
-          megabitsPerSecond =
-            samples.reduce((sum, curr) => {
-              return sum + curr;
-            }, 0) / samples.length;
+          if (samples.length) {
+            megabitsPerSecond =
+              samples.reduce((sum, curr) => {
+                return sum + curr;
+              }, 0) / samples.length;
 
-          onProgress({
-            megabitsPerSecond,
-            percentDone
-          });
+            onProgress({
+              megabitsPerSecond,
+              percentDone
+            });
+          }
 
           lastUpdateTime = Date.now();
           downloadedBytesSinceLastUpdate = 0;
