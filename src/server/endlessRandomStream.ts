@@ -1,5 +1,4 @@
 import { Readable as ReadableStream } from 'node:stream';
-// import { randomBytes } from 'node:crypto';
 
 let cachedRandomBytes: Record<string, Buffer> = {};
 
@@ -30,9 +29,9 @@ function randomBytes(
   callback(null, buffer);
 }
 
-export default function endlessRandomBytesReadableStream() {
-  let producedSize = 0;
+const chunkSize = 1024 * 32; // 32KB chunks
 
+export default function endlessRandomBytesReadableStream() {
   return new ReadableStream({
     read(readSize) {
       randomBytes(readSize, (error, buffer) => {
@@ -41,9 +40,9 @@ export default function endlessRandomBytesReadableStream() {
           return;
         }
 
-        producedSize += readSize;
         this.push(buffer);
       });
-    }
+    },
+    highWaterMark: chunkSize
   });
 }
