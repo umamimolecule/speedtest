@@ -1,5 +1,9 @@
 # LANSpeedTest
 
+Measures data transfer speed for your LAN.  Install the server on one machine and connect to it from another machine on your network.
+
+![](./images/screenshot.gif)
+
 ## Notes for Proxmox
 
 Choose the following settings:
