@@ -1,6 +1,8 @@
 import express, { Application } from 'express';
 import path from 'path';
-import endlessRandomBytesReadableStream from './endlessRandomStream';
+import endlessRandomBytesReadableStream, {
+  clearCache
+} from './endlessRandomStream';
 
 const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
 const PORT: string = process.env.PORT || '3000';
@@ -21,6 +23,14 @@ app.get('/stream', (req, res) => {
   stream.on('error', (err: Error | unknown) => {
     console.error(err);
     res.status(500).send('Internal Server Error');
+  });
+
+  stream.on('close', () => {
+    clearCache();
+  });
+
+  stream.on('end', () => {
+    clearCache();
   });
 });
 

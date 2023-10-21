@@ -44,6 +44,8 @@ async function downloadFileInChunks(
   let samples: number[] = [];
 
   let megabitsPerSecond = 0;
+  let result;
+
   try {
     while (true) {
       const percentDone = (100 * (Date.now() - startTime)) / totalDuration;
@@ -52,7 +54,8 @@ async function downloadFileInChunks(
         break;
       }
 
-      const { done, value } = await reader.read();
+      result = await reader.read();
+      const { value, done } = result;
 
       if (value) {
         totalDownloadedBytes += value.length;
@@ -68,7 +71,8 @@ async function downloadFileInChunks(
             sample !== Number.POSITIVE_INFINITY &&
             sample !== Number.NEGATIVE_INFINITY
           ) {
-            samples = [sample, ...samples.slice(0, sampleCount - 1)];
+            const newSamples = samples.slice(0, sampleCount - 1);
+            samples = [sample, ...newSamples];
           }
 
           if (samples.length) {
