@@ -1,13 +1,56 @@
 import express, { Application } from 'express';
+import { WebSocket, Server as WebsocketServer } from 'ws';
 import path from 'path';
 import endlessRandomBytesReadableStream, {
   clearCache
 } from './endlessRandomStream';
 
 const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
-const PORT: string = process.env.PORT || '3000';
+const PORT: number = Number.parseInt(process.env.PORT || '3000', 10);
+const WS_PORT: number = Number.parseInt(process.env.WS_PORT || '3001', 10);
+const CHUNK_SIZE = 2 * 1024 * 1024;
 
 const app: Application = express();
+const wss = new WebsocketServer({ port: WS_PORT });
+
+const buffer = Buffer.alloc(CHUNK_SIZE);
+for (let i = 0; i < CHUNK_SIZE; i++) {
+  buffer[i] = Math.floor(Math.random() * 256);
+}
+
+const sendData = (ws: WebSocket) => {
+  chunks++;
+  ws.send(buffer);
+};
+
+let chunks = 0;
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  ws.on('message', (message) => {
+    switch (message.toString()) {
+      case 'START':
+        chunks = 0;
+        sendData(ws);
+        break;
+
+      case 'MORE':
+        sendData(ws);
+        break;
+
+      case 'STOP':
+        console.log(
+          `${chunks} chunks sent (total of ${(chunks * CHUNK_SIZE) / 1024}MB)`
+        );
+        break;
+    }
+  });
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
 
 app.get('/stream', (req, res) => {
   const stream = endlessRandomBytesReadableStream();

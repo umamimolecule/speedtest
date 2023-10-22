@@ -1,22 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import cn from 'classnames';
+import { useSpeedTest } from './hooks/useSpeedTest';
 import './App.scss';
-import {
-  SpeedTestProgressResult,
-  SpeedTestResult,
-  downloadFileInChunks
-} from './util/downloader';
-
-const TEST_DURATION = 10000;
 
 export function App() {
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
-  const [progressResult, setProgressResult] =
-    useState<SpeedTestProgressResult>(null);
-  const [result, setResult] = useState<SpeedTestResult>(null);
-  const [runningTest, setRunningTest] = useState(false);
   const [version, setVersion] = useState('');
+  const { start, progress, isTestRunning } = useSpeedTest();
 
   useEffect(() => {
     async function init() {
@@ -29,29 +18,8 @@ export function App() {
     init();
   }, []);
 
-  const onProgress = (result: SpeedTestProgressResult) => {
-    setProgressResult(result);
-  };
-
-  const startDownload = async () => {
-    setRunningTest(true);
-    try {
-      const start = Date.now();
-      const result = await downloadFileInChunks(
-        `/stream?ts=${start}`,
-        TEST_DURATION,
-        onProgress
-      );
-      setResult(result);
-    } finally {
-      setRunningTest(false);
-      setProgressResult(null);
-    }
-  };
-
-  const formatRate = (megabytesPerSecond?: number): React.ReactNode => {
-    const haveValue =
-      megabytesPerSecond !== null && megabytesPerSecond !== undefined;
+  const formatRate = (megabytesPerSecond: number): React.ReactNode => {
+    const haveValue = megabytesPerSecond > 0;
     const value = haveValue ? Math.round(megabytesPerSecond) : '----';
     return (
       <div className="flex flex-row gap-4 items-baseline">
@@ -70,7 +38,7 @@ export function App() {
   };
 
   const renderProgressBar = () => {
-    if (!runningTest || !progressResult) {
+    if (!isTestRunning || !progress.percentComplete) {
       return (
         <div
           className="-mt-8"
@@ -81,7 +49,7 @@ export function App() {
       );
     }
 
-    const percent = Math.round(progressResult.percentDone);
+    const percent = Math.round(progress.percentComplete);
 
     return (
       <div
@@ -104,20 +72,16 @@ export function App() {
         <div className="text-2xl text-neutral-400 mb-4 font-thin">
           LAN speed test
         </div>
-        {runningTest ? (
-          <div>{formatRate(progressResult?.megabitsPerSecond)}</div>
-        ) : (
-          <div>{formatRate(result?.megabitsPerSecond)}</div>
-        )}
+        <div>{formatRate(progress.megabitsPerSecond)}</div>
         {renderProgressBar()}
         <button
           className={cn([
             'bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-600 text-white disabled:text-neutral-400 py-2 px-4 rounded'
           ])}
-          onClick={() => startDownload()}
-          disabled={runningTest}
+          onClick={() => start()}
+          disabled={isTestRunning}
         >
-          {runningTest ? 'Running test...' : 'Start test'}
+          {isTestRunning ? 'Running test...' : 'Start test'}
         </button>
       </div>
       <div>
