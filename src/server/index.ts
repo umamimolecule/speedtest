@@ -21,7 +21,7 @@ const PORT: number = Number.parseInt(
   10
 );
 const WS_PORT: number = Number.parseInt(
-  args['-w'] || process.env.WS_PORT || '3001',
+  args['-w'] || process.env.WS_PORT || '3002',
   10
 );
 const CHUNK_SIZE = 2 * 1024 * 1024;
