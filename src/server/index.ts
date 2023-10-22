@@ -63,7 +63,9 @@ wss.on('connection', (ws) => {
 
       case 'STOP':
         console.log(
-          `${chunks} chunks sent (total of ${(chunks * CHUNK_SIZE) / 1024}MB)`
+          `${chunks} chunks sent (total of ${
+            (chunks * CHUNK_SIZE) / (1024 * 1024)
+          }MB)`
         );
         break;
     }
