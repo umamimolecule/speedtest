@@ -3,16 +3,24 @@ import cn from 'classnames';
 import { useSpeedTest } from './hooks/useSpeedTest';
 import './App.scss';
 
+type AppInfo = {
+  version: string;
+  port: number;
+  webSocketPort: number;
+};
+
 export function App() {
-  const [version, setVersion] = useState('');
-  const { start, progress, isTestRunning } = useSpeedTest();
+  const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
+  const { start, progress, isTestRunning } = useSpeedTest(
+    appInfo?.webSocketPort
+  );
 
   useEffect(() => {
     async function init() {
-      const response = await fetch('/version');
+      const response = await fetch('/appinfo');
       if (response.ok) {
-        const versionInfo = await response.json();
-        setVersion(versionInfo.version);
+        const info = (await response.json()) as AppInfo;
+        setAppInfo(info);
       }
     }
     init();
@@ -79,7 +87,7 @@ export function App() {
             'bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-600 text-white disabled:text-neutral-400 py-2 px-4 rounded'
           ])}
           onClick={() => start()}
-          disabled={isTestRunning}
+          disabled={isTestRunning || !appInfo}
         >
           {isTestRunning ? 'Running test...' : 'Start test'}
         </button>
@@ -93,7 +101,7 @@ export function App() {
         </a>
       </div>
       <div className="absolute bottom-8 left-8 text-neutral-500">
-        v{version}
+        {appInfo ? `v${appInfo.version}` : 'Loading...'}
       </div>
     </div>
   );

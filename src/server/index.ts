@@ -105,9 +105,9 @@ app.get('/stream', (req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/version', (req, res) => {
+app.get('/appinfo', (req, res) => {
   var pjson = require('../../package.json');
-  res.send({ version: pjson.version });
+  res.send({ version: pjson.version, port: PORT, webSocketPort: WS_PORT });
 });
 
 app.use(

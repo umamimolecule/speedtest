@@ -14,7 +14,7 @@ const TEST_DURATION_MS = 10000;
 
 const noop = (...args: any[]): any => undefined;
 
-const useSpeedTest = () => {
+const useSpeedTest = (webSocketPort?: number) => {
   const [progress, setProgress] = useState<ProgressUpdate>({
     megabitsPerSecond: 0,
     percentComplete: 0
@@ -82,7 +82,7 @@ const useSpeedTest = () => {
 
     socket.current?.close();
     socket.current = await connectToWebSocketServer(
-      `ws://${window.location.hostname}:3001`,
+      `ws://${window.location.hostname}:${webSocketPort || 3001}`,
       noop,
       onMessage,
       noop,
