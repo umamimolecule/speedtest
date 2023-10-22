@@ -1,9 +1,6 @@
 import express, { Application } from 'express';
 import { WebSocket, Server as WebsocketServer } from 'ws';
 import path from 'path';
-import endlessRandomBytesReadableStream, {
-  clearCache
-} from './endlessRandomStream';
 
 const args: Record<string, string> = {};
 let argKey: string;
@@ -74,31 +71,6 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     console.log('Client disconnected');
-  });
-});
-
-app.get('/stream', (req, res) => {
-  const stream = endlessRandomBytesReadableStream();
-
-  // Set response headers
-  res.setHeader('Content-Type', 'application/octet-stream');
-  // res.setHeader('Content-Length', '999999999999');
-
-  // Pipe the Readable Stream to the Response
-  stream.pipe(res);
-
-  // Optional: Handle errors
-  stream.on('error', (err: Error | unknown) => {
-    console.error(err);
-    res.status(500).send('Internal Server Error');
-  });
-
-  stream.on('close', () => {
-    clearCache();
-  });
-
-  stream.on('end', () => {
-    clearCache();
   });
 });
 
