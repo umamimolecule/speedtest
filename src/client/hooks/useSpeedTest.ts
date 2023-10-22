@@ -28,6 +28,7 @@ const useSpeedTest = (webSocketPort?: number) => {
   const bytesReadSinceLastSample = useRef<number>(0);
   const updateTimerId = useRef<number>(0);
   const startTime = useRef<number>(0);
+  const stopped = useRef(false);
 
   const onMessage = (event: MessageEvent) => {
     if (event.type === 'message') {
@@ -40,12 +41,18 @@ const useSpeedTest = (webSocketPort?: number) => {
   };
 
   const updateProgress = () => {
+    if (stopped.current) {
+      return;
+    }
+
     const sample =
       bytesReadSinceLastSample.current /
       (Date.now() - lastSampleTime.current) /
       125;
 
-    samples.current.write(sample);
+    if (!Number.isNaN(sample)) {
+      samples.current.write(sample);
+    }
 
     const filteredSamples = samples.current.toArray().filter((x) => x > 0);
     const megabitsPerSecond =
@@ -57,7 +64,10 @@ const useSpeedTest = (webSocketPort?: number) => {
       (100 * (Date.now() - startTime.current)) / TEST_DURATION_MS
     );
 
-    setProgress({ percentComplete, megabitsPerSecond });
+    setProgress({
+      percentComplete,
+      megabitsPerSecond
+    });
 
     bytesReadSinceLastSample.current = 0;
     lastSampleTime.current = Date.now();
@@ -89,11 +99,14 @@ const useSpeedTest = (webSocketPort?: number) => {
       noop
     );
 
-    socket.current.send('START');
     window.setTimeout(stop, TEST_DURATION_MS);
     startTime.current = Date.now();
     bytesReadSinceLastSample.current = 0;
     lastSampleTime.current = Date.now();
+    samples.current = new CircularBuffer<number>(MAX_SAMPLE_COUNT);
+    stopped.current = false;
+    socket.current.send('START');
+    updateProgress();
 
     setIsTestRunning(true);
 
@@ -104,6 +117,8 @@ const useSpeedTest = (webSocketPort?: number) => {
   };
 
   const stop = async (): Promise<void> => {
+    stopped.current = true;
+
     if (updateTimerId.current) {
       clearTimeout(updateTimerId.current);
       updateTimerId.current = 0;
@@ -113,7 +128,6 @@ const useSpeedTest = (webSocketPort?: number) => {
     socket.current?.close();
     socket.current = null;
 
-    setProgress({ ...progress, percentComplete: 0 });
     setIsTestRunning(false);
   };
 
