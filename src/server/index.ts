@@ -5,9 +5,25 @@ import endlessRandomBytesReadableStream, {
   clearCache
 } from './endlessRandomStream';
 
+const args: Record<string, string> = {};
+let argKey: string;
+process.argv.slice(2).forEach((x, i) => {
+  if (i % 2 === 0) {
+    argKey = x;
+  } else {
+    args[argKey] = x;
+  }
+});
+
 const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
-const PORT: number = Number.parseInt(process.env.PORT || '3000', 10);
-const WS_PORT: number = Number.parseInt(process.env.WS_PORT || '3001', 10);
+const PORT: number = Number.parseInt(
+  args['-p'] || process.env.PORT || '3000',
+  10
+);
+const WS_PORT: number = Number.parseInt(
+  args['-w'] || process.env.WS_PORT || '3001',
+  10
+);
 const CHUNK_SIZE = 2 * 1024 * 1024;
 
 const app: Application = express();
