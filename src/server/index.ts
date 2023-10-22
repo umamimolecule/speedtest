@@ -11,7 +11,16 @@ const WS_PORT: number = Number.parseInt(process.env.WS_PORT || '3001', 10);
 const CHUNK_SIZE = 2 * 1024 * 1024;
 
 const app: Application = express();
-const wss = new WebsocketServer({ port: WS_PORT });
+const wss = new WebsocketServer({ host: '0.0.0.0', port: WS_PORT });
+
+console.log(
+  '\x1b[34m',
+  `${String.fromCodePoint(
+    0x1f680
+  )} Websocket server has started running at http://localhost:${WS_PORT}/ ${String.fromCodePoint(
+    0x1f680
+  )}`
+);
 
 const buffer = Buffer.alloc(CHUNK_SIZE);
 for (let i = 0; i < CHUNK_SIZE; i++) {
@@ -99,7 +108,7 @@ app.listen(PORT, () => {
     '\x1b[34m',
     `${String.fromCodePoint(
       0x1f680
-    )} Server has started running at http://localhost:${PORT}/ ${String.fromCodePoint(
+    )} HTTP server has started running at http://localhost:${PORT}/ ${String.fromCodePoint(
       0x1f680
     )}`
   );
